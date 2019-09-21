@@ -6,19 +6,27 @@ public class Program
 	
 	public static void main(String[] args)
 	{
-		System.out.println("Привет, я супер чат-бот! \n"
-				+ "Вот что я умею:\n"
-				+ "\\start - начать игру\n"
-				+ "\\end - завершить игру\n"
-				+ "\\help - справка\n"
-				+ "Пиши старт и погнали!");
 		boolean isPlay = true;
 		String command = "";
+		Game game = new Game();
+		game.greeting();
 		while(isPlay)
 		{
 			command = scan.nextLine();
-			
+			if (command.equals("start"))
+			{
+				game.start();
+			}
+			else if(command.equals("help"))
+			{
+				game.help();
+			}
+			else if(command.equals("end"))
+			{
+				isPlay = false;
+			}
 		}
+		System.out.println("До новых встреч!");
 	}
 
 }
