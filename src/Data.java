@@ -1,6 +1,6 @@
 public class Data 
 {
-	private Pair[] Questions;
+	public Pair[] Questions;
 	public int QuestionsCount = 0;
 	public String Info = "Вот что я умею:\n"
 			+ "start - начать игру\n"
@@ -10,16 +10,46 @@ public class Data
 	
 	public Data()
 	{
-		Questions = new Pair[2];
-		for (int i = 0; i <= 1; i++)
+		Questions = new Pair[21];
+		for (int i = 0; i <= 20; i++)
 			Questions[i] = new Pair();
-		Questions[0].set("День рождения Артема?", "12 апреля");
-		Questions[1].set("День рождения Никиты?", "21 декабря");
+		Questions[0].set("Как называется боязнь открытых пространств?", "Агорафобия");
+		Questions[1].set("Оборудование для обмётывания срезов текстильных материалов при ихготовлении швейных изделий", "Оверлок");
+		Questions[2].set("Кто написал книгу\"Алиса в стране чудес\"? Ф.о: И.Фамилия", "Л.Кэрролл");
+		Questions[3].set("В каком году отменили крепосстное право?", "1861");
+		Questions[4].set("Имя музыканта Высоцкого", "Владимир");
+		Questions[5].set("Имя рыжеволосово друга Гарри Поттера", "Рон");
+		Questions[6].set("Почему так жесток снег?", "Оставляет твои следы");
+		Questions[7].set("Снег растаявший - он ...", "Вода");
+		Questions[8].set("В каком году были сброшеы атомные бомбы на Хиросиму и Нагасаки?", "1945");
+		Questions[9].set("Международный день полета человека в космос?", "12 апреля");
+		Questions[10].set("Первый покемон Эша Кечума", "Пикачу");
+		Questions[11].set("Чьей теоремой на равне с нахождением дискриминанта пользуются для решений квадратных уравнений", "Виета");
+		Questions[12].set("Переведите слово \"go\"", "Идти");
+		Questions[13].set("Зеленый пигмент, содержащийся в растениях?", "Хлорофилл");
+		Questions[14].set("Дюжина- сколько это?", "12");
+		Questions[15].set("Верховный бог в скандинавской мифологии", "Один");
+		Questions[16].set("Процесс превращения пара в жидкость.", "Конденсация");
+		Questions[17].set("Сложившееся устройство общественной жизни, быта.", "Уклад");
+		Questions[18].set("Часть электрической машины, несущая на себе обмотку.", "Якорь");
+		Questions[19].set("Игра, при которой шары загоняются в лузы ударами кия.", "Бильярд");
+		Questions[20].set("Безветрие, затишье на море?", "Штиль");
+		
 		QuestionsCount = Questions.length;
-	};
+	}
 	
 	public Pair getQuestion(int number)
 	{
 		return Questions[number];
+	}
+	
+	public boolean hasQuestion(String q)
+	{
+		for (int i = 0; i < QuestionsCount; i++)
+		{
+			if(q.equals(Questions[i].getQuestion()))
+				return true;
+		}
+		return false;
 	}
 }

@@ -1,41 +1,57 @@
-import java.util.Scanner;
-
-public class Game 
+public final class Game 
 {
 	private Data data = new Data();
 	private MyRandom random = new MyRandom(data.QuestionsCount - 1);
-	private Scanner scan = new Scanner(System.in);
-	private boolean isPlay;
+	public boolean isPlay = true;
+	private boolean isStarted = false;
+	private Pair question;
 	
-	public void greeting()
+	public String greeting()
 	{
-		System.out.println("Привет, я супер чат-бот! \n" + data.Info);
+		return "Привет, я супер чат-бот! \n" + data.Info;
 	}
 	
-	public void help()
+	public String help()
 	{
-		System.out.println(data.Info);
+		return data.Info;
 	}
 	
-	public void start()
+	public String step(String input) throws Exception
 	{
-		isPlay = true;
-		String input;
-		Pair question;
-		while(isPlay)
+		if (input.equals("start"))
 		{
-			System.out.println(random.CanGetValue);
-			scan.nextLine();
-			if (!random.CanGetValue) break;
-			int number = random.getRandomNumber();
-			question = data.getQuestion(number);
-			System.out.println(question.getQuestion());
-			input = scan.nextLine();
-			if (input.equals(question.getAnswer()))
+			if(isStarted) 
+				return "Игра уже идет, отвечай на вопрос :\n"
+						+ question.getQuestion();
+			else
 			{
-				System.out.println("Красава!");
+				question = data.getQuestion(random.getRandomNumber());
+				isStarted = true;
+				return question.getQuestion();	
+			}		
+		}
+		else if(input.equals("help"))
+		{
+			return help();
+		}
+		else if(input.equals("end"))
+		{
+			isPlay = false;
+			return "До новых встреч!";
+		}
+		else if (input.equals(question.getAnswer()))
+		{
+			if (!random.CanGetValue)
+			{
+				isPlay = false;
+				return "Вопросы кончились, молодец!";	
 			}
+			question = data.getQuestion(random.getRandomNumber());
+			return "Красава!\n"
+					+ "Лови следующий вопрос:\n"
+					+ question.getQuestion();
 			
 		}
+		else return "Попробуй еще раз...";	
 	}
 }

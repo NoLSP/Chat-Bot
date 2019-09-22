@@ -18,13 +18,13 @@ public class MyRandom
 		completeValues = new boolean[Max + 1];
 	}
 	
-	public int getRandomNumber()
+	public int getRandomNumber() throws Exception
 	{
-		int nextValue = 0;
+		if (!CanGetValue) throw new Exception();
+		int nextValue = random.nextInt(diff + 1) + Min;
 		while (completeValues[nextValue])
 		{
 			nextValue = random.nextInt(diff + 1) + Min;
-			System.out.println(nextValue);
 		}
 		completeValues[nextValue] = true;
 		completeValuesCount += 1;
