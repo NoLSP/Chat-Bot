@@ -1,3 +1,4 @@
+import java.util.List;
 import java.util.Scanner;
 
 public class Console {
@@ -11,10 +12,16 @@ public class Console {
 	
 	public void play() throws Exception
 	{
-		System.out.println(game.greeting());
-		while (game.isPlay)
+		print(game.greeting());
+		while (game.getGameStatus())
 		{
-			System.out.println(game.step(scan.nextLine()));
+			print(game.step(scan.nextLine()));
 		}
+	}
+	
+	private void print(List<String> data)
+	{
+		for ( String str : data)
+			System.out.println(str);
 	}
 }

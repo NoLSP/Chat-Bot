@@ -2,8 +2,7 @@ public class Program
 {	
 	public static void main(String[] args) throws Exception
 	{
-		Game game = new Game();
-		Console console = new Console(game);
+		Console console = new Console(new Game());
 		console.play();
 	}
 }

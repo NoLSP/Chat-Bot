@@ -1,57 +1,78 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public final class Game 
 {
 	private Data data = new Data();
 	private MyRandom random = new MyRandom(data.QuestionsCount - 1);
-	public boolean isPlay = true;
+	private boolean isPlay = true;
 	private boolean isStarted = false;
-	private Pair question;
+	private Pair task;
+	private enum commands {start, end, help};
 	
-	public String greeting()
+	public List<String> greeting()
 	{
-		return "Привет, я супер чат-бот! \n" + data.Info;
+		List<String> result = new ArrayList<String>();
+		result.add("Привет, я супер чат-бот!");
+		for (int i = 0; i < data.Info.size(); i++)
+		{
+			String item = data.Info.get(i);
+			result.add(item);
+		}	
+		return result;
 	}
 	
-	public String help()
+	public List<String> help()
 	{
 		return data.Info;
 	}
 	
-	public String step(String input) throws Exception
+	public boolean getGameStatus()
 	{
-		if (input.equals("start"))
+		return isPlay;
+	}
+	
+	public Pair getTask()
+	{
+		return task;
+	}
+	
+	public List<String> step(String input) throws Exception
+	{
+		if (input.equals(commands.start.name()))
 		{
 			if(isStarted) 
-				return "Игра уже идет, отвечай на вопрос :\n"
-						+ question.getQuestion();
+			{
+				return Arrays.asList("Игра уже идет, отвечай на вопрос :", task.getQuestion());
+			}
 			else
 			{
-				question = data.getQuestion(random.getRandomNumber());
+				task = data.getQuestion(random.getRandomNumber());
 				isStarted = true;
-				return question.getQuestion();	
+				return Arrays.asList(task.getQuestion());	
 			}		
 		}
-		else if(input.equals("help"))
+		else if(input.equals(commands.help.name()))
 		{
-			return help();
+			return data.Info;
 		}
-		else if(input.equals("end"))
+		else if(input.equals(commands.end.name()))
 		{
 			isPlay = false;
-			return "До новых встреч!";
+			return Arrays.asList("До новых встреч!");
 		}
-		else if (input.equals(question.getAnswer()))
+		else if (input.equals(task.getAnswer()))
 		{
-			if (!random.CanGetValue)
+			if (!random.CanGetValue())
 			{
 				isPlay = false;
-				return "Вопросы кончились, молодец!";	
+				return Arrays.asList("Вопросы кончились, молодец!");	
 			}
-			question = data.getQuestion(random.getRandomNumber());
-			return "Красава!\n"
-					+ "Лови следующий вопрос:\n"
-					+ question.getQuestion();
+			task = data.getQuestion(random.getRandomNumber());
+			return Arrays.asList("Красава!", "Лови следующий вопрос:", task.getQuestion());
 			
 		}
-		else return "Попробуй еще раз...";	
+		else return Arrays.asList("Попробуй еще раз...");	
 	}
 }
