@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,7 +9,11 @@ public class Data
 {
 	public List<Pair> Tasks = new ArrayList<Pair>();
 	public int QuestionsCount = 0;
-	public List<String> Info = Arrays.asList("Вот что я умею:", "start - начать игру", "end - завершить игру", "help - справка", "Пиши старт и погнали!"); 
+	public String Info = "Вот что я умею:\n"
+			+ "/play - начать игру\n"
+			+ "/end - завершить игру\n"
+			+ "/help - справка\n"
+			+ "Пиши /play и погнали!"; 
 	
 	public Data()
 	{

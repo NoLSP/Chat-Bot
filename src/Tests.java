@@ -1,5 +1,3 @@
-import java.util.Arrays;
-import java.util.List;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +9,7 @@ class Tests {
 		int result = 0;
 		for (int i = 0; i < 10; i++)
 		{
-			result += rnd.getRandomNumber();
+			result += rnd.next();
 			//System.out.println(result);
 		}
 		Assert.assertEquals(45, result);
@@ -19,68 +17,61 @@ class Tests {
 	
 	@Test
 	void testGameGreeting() throws Exception {
-		Game game = new Game();
-		
-		Assert.assertEquals(Arrays.asList("Привет, я супер чат-бот!", "Вот что я умею:", "start - начать игру",
-				"end - завершить игру", "help - справка", "Пиши старт и погнали!"), game.greeting());
+		Assert.assertEquals("Привет, я супер чат-бот!\n" + "Вот что я умею:\n" + "/play - начать игру\n" 
+				+ "/end - завершить игру\n" + "/help - справка\n" + "Пиши /play и погнали!", Game.greeting());
 	}
 	
 	@Test
 	void testGameHelp() throws Exception {
-		Game game = new Game();
-		
-		Assert.assertEquals(Arrays.asList("Вот что я умею:", "start - начать игру", "end - завершить игру",
-				"help - справка", "Пиши старт и погнали!"), game.help());
+		Assert.assertEquals("Вот что я умею:\n" + "/play - начать игру\n" 
+				+ "/end - завершить игру\n" + "/help - справка\n" + "Пиши /play и погнали!", Game.help());
 	}
 	
 	@Test
 	void testGameStart() throws Exception {
-		Game game = new Game();
 		Data data = new Data();
-		Assert.assertTrue(data.hasQuestion(game.step("start").get(0)));
+		Game.step("/end");
+		Assert.assertTrue(data.hasQuestion(Game.step("/play")));
 	}
 	
 	@Test
 	void testGameEnd() throws Exception {
-		Game game = new Game();
-		Assert.assertEquals(Arrays.asList("До новых встреч!"), game.step("end"));
+		Assert.assertEquals("До новых встреч!", Game.step("/end"));
 	}
 	
 	@Test
 	void testGameDubleStart() throws Exception {
-		Game game = new Game();
-		String question = game.step("start").get(0);
-		Assert.assertEquals(Arrays.asList("Игра уже идет, отвечай на вопрос :", question), game.step("start"));
+		Game.step("/end");
+		String question = Game.step("/play");
+		Assert.assertEquals("Игра уже идет, отвечай на вопрос :\n\n" + question, Game.step("/play"));
 	}
 	
 	@Test
 	void testGameTrueAnswer() throws Exception {
-		Game game = new Game();
 		Data data = new Data();
-		String question = game.step("start").get(0);
-		List<String> result = game.step(data.GetAnswer(question));
-		Assert.assertEquals( Arrays.asList("Красава!", "Лови следующий вопрос:", game.getTask().getQuestion()), result);
+		String question = Game.step("/play");
+		String result = Game.step(data.GetAnswer(question));
+		Assert.assertEquals("Красава!\n" + "Лови следующий вопрос: " + Game.getTask().getQuestion(), result);
 	}
 	
 	@Test
 	void testGameFalseAnswer() throws Exception {
-		Game game = new Game();
-		game.step("start");
-		Assert.assertEquals(Arrays.asList("Попробуй еще раз..."), game.step("12345"));
+		Game.step("/play");
+		Assert.assertEquals("Попробуй еще раз...", Game.step("12345"));
 	}
 	
 	@Test
 	void testGameQuestionsOver() throws Exception {
-		Game game = new Game();
 		Data data = new Data();
-		game.step("start");
-		Pair question = game.getTask();
-		List<String> result = null;
+		Game.step("/end");
+		Game.step("/play");
+		Pair question = Game.getTask();
+		String result = null;
 		for (int i = 0; i < data.QuestionsCount; i++)
 		{
-			result = game.step(question.getAnswer());
-			question = game.getTask();
+			result = Game.step(question.getAnswer());
+			question = Game.getTask();
 		}
-		Assert.assertEquals(Arrays.asList("Вопросы кончились, молодец!"), result);
+		Assert.assertEquals("Вопросы кончились, молодец!", result);
 	}
 }

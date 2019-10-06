@@ -1,11 +1,13 @@
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Random;
 
-public class MyRandom 
+public class MyRandom implements Iterator<Integer>
 {
 	private int Min;
-	public int Max;
+	private int Max;
 	private Random random = new Random();
 	private int currentIndex = 0;
 	private List<Integer> indexes = new ArrayList<Integer>();
@@ -26,16 +28,21 @@ public class MyRandom
 		}
 	}
 	
-	public int getRandomNumber() throws Exception
-	{
-		if (CanGetValue())
+	@Override
+	public boolean hasNext() {
+		return currentIndex != indexes.size();
+	}
+
+	@Override
+	public Integer next() {
+		if (hasNext())
 			return indexes.get(currentIndex++);	
 		else
-			throw new Exception();
+			throw new NoSuchElementException();
 	}
 	
-	public boolean CanGetValue()
+	public void reset()
 	{
-		return currentIndex != indexes.size();
+		currentIndex = 0;
 	}
 }
