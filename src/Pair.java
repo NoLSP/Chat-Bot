@@ -1,52 +1,46 @@
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+
 public class Pair{
-    private String question;
-    private String answer;
+    private SendMessage message;
+    private SendPhoto photo;
 
-    public Pair() {}
+    public Pair(SendMessage msg, SendPhoto pht) 
+    {
+    	message = msg;
+    	photo = pht;
+    }
     
-    public Pair(String question, String answer) {
-        this.question = question;
-        this.answer = answer;
+    public Pair(SendMessage msg) 
+    {
+    	message = msg;
+    	photo = null;
+    }
+    
+    public Pair(SendPhoto pht) 
+    {
+    	photo = pht;
+    	message = null;
     }
 
-    public void setQuestion(String question) {
-        this.question = question;
+    public boolean hasMessage() {
+        return message != null;
     }
 
-    public void setAnswer(String answer) {
-        this.answer = answer;
+    public boolean hasPhoto() {
+        return photo != null;
+    }
+    
+    public boolean hasBoth()
+    {
+    	return photo != null && message != null;
     }
 
-    public String getQuestion() {
-        return question;
+    public SendMessage getMessage() {
+        return message;
     }
 
-    public String getAnswer() {
-        return answer;
-    }
-
-    public void set(String question, String answer) {
-    	setQuestion(question);
-    	setAnswer(answer);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Pair pair = (Pair) o;
-
-        if (question != null ? !question.equals(pair.question) : pair.question != null) return false;
-        if (answer != null ? !answer.equals(pair.answer) : pair.answer != null) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = question != null ? question.hashCode() : 0;
-        result = 31 * result + (answer != null ? answer.hashCode() : 0);
-        return result;
+    public SendPhoto getPhoto() {
+        return photo;
     }
 }
