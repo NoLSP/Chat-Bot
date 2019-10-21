@@ -1,46 +1,31 @@
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+public class Pair<T1, T2>{
+    private T1 item1;
+    private T2 item2;
 
-public class Pair{
-    private SendMessage message;
-    private SendPhoto photo;
-
-    public Pair(SendMessage msg, SendPhoto pht) 
+    public Pair(T1 itm1, T2 itm2) 
     {
-    	message = msg;
-    	photo = pht;
-    }
-    
-    public Pair(SendMessage msg) 
-    {
-    	message = msg;
-    	photo = null;
-    }
-    
-    public Pair(SendPhoto pht) 
-    {
-    	photo = pht;
-    	message = null;
+    	item1 = itm1;
+    	item2 = itm2;
     }
 
-    public boolean hasMessage() {
-        return message != null;
+    public boolean hasItem1() {
+        return item1 != null;
     }
 
-    public boolean hasPhoto() {
-        return photo != null;
+    public boolean hasItem2() {
+        return item2 != null;
     }
     
     public boolean hasBoth()
     {
-    	return photo != null && message != null;
+    	return item1 != null && item2 != null;
     }
 
-    public SendMessage getMessage() {
-        return message;
+    public T1 getItem1() {
+        return item1;
     }
 
-    public SendPhoto getPhoto() {
-        return photo;
+    public T2 getItem2() {
+        return item2;
     }
 }

@@ -1,9 +1,8 @@
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -18,6 +17,7 @@ public class PokeBot extends TelegramLongPollingBot {
 
 	@Override
 	public void onUpdateReceived(Update e) {
+		System.out.println(Thread.currentThread());
 		if (e.hasMessage())
 		{
 			if(!games.containsKey(e.getMessage().getChatId().intValue()))
@@ -25,57 +25,18 @@ public class PokeBot extends TelegramLongPollingBot {
 				games.put(e.getMessage().getChatId().intValue(), new Game());
 			}
 			Message msg = e.getMessage();
-			Game game = games.get(msg.getChatId().intValue());
-			Pair output = game.step(msg);
-			if (output.hasMessage())
-			{
-				try { 
-					execute(output.getMessage());
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}
-			else
-			{
-				try { 
-					execute(output.getPhoto());
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}
+			Long chatId = msg.getChatId();
+			Game game = games.get(chatId.intValue());
+			Pair<SendMessage, SendPhoto> output = game.step(msg);
+			
+			sendMsg(chatId, output);
 		}
 		if (e.hasCallbackQuery())
 		{
-			Game game = games.get(e.getCallbackQuery().getMessage().getChatId().intValue());
-			Pair output = game.step(e.getCallbackQuery());
-			if (output.hasBoth())
-			{
-				try { 
-					execute(output.getMessage());
-					execute(output.getPhoto());
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}			
-			}
-			else
-			{
-				if (output.hasMessage())
-				{
-					try { 
-						execute(output.getMessage());
-					} catch (Exception e1) {
-						e1.printStackTrace();
-					}
-				}
-				else
-				{
-					try { 
-						execute(output.getPhoto());
-					} catch (Exception e1) {
-						e1.printStackTrace();
-					}
-				}
-			}
+			Long chatId = e.getCallbackQuery().getMessage().getChatId();
+			Game game = games.get(chatId.intValue());
+			Pair<SendMessage, SendPhoto> output = game.step(e.getCallbackQuery());
+			sendMsg(chatId, output);
 		}
 	}
 
@@ -83,11 +44,24 @@ public class PokeBot extends TelegramLongPollingBot {
 		return "968482226:AAEyAg1bNq5uPRtenot5nEwffEwiyJKJLIY";
 	}
 	
-	private void sendMsg(SendMessage msg) {
-		try { //Чтобы не крашнулась программа при вылете Exception 
-			execute(msg);
-		} catch (TelegramApiException e){
-			e.printStackTrace();
+	private void sendMsg( Long chatId, Pair<SendMessage, SendPhoto> msg) {
+		if (msg.hasItem1())
+		{
+			try { 
+				execute(msg.getItem1());
+			} catch (TelegramApiException e1) {
+				System.out.println("Exception in execute message");
+				e1.printStackTrace();
+			}
+		}
+		if (msg.hasItem2())
+		{
+			try { 
+				execute(msg.getItem2());
+			} catch (Exception e1) {
+				e1.printStackTrace();
+				System.out.println("Eception in execute photo");
+			}
 		}
 	}
 }

@@ -72,4 +72,10 @@ public class AnswersTree {
 	{
 		return answers;
 	}
+	
+	public String getResult(ArrayList<Integer> userAnswers)
+	{
+		//TO DO...
+		return new String();
+	}
 }
