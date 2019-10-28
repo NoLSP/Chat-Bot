@@ -1,8 +1,6 @@
 import java.util.ArrayList;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 
@@ -16,15 +14,14 @@ public class Data
 	private Pair<String, File> result;
 	private String Info = "Вот что я умею:\n"
 			+ "/play - начать игру\n"
-			+ "/help - справка\n"
-			+ "Пиши /play и погнали!"; 
+			+ "/help - справка\n"; 
 	
 	public Data()
 	{
 		//answers = new AnswersTree(0, 0);
 		answers = new String[0];
 		tasks = new ArrayList<Task>();
-		currentQuestionNumber = 0;
+		currentQuestionNumber = -1;
 		result = null;
 		answersCount = new ArrayList<Integer>();
 		try 
@@ -39,54 +36,31 @@ public class Data
 	
 	private void fillTasks() throws IOException
 	{
-		int ansCount = 1;
-		String dirPath = new File("").getAbsolutePath();
-		File file = new File(dirPath, "Questions.txt");
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		String input = reader.readLine();
-		while(null != input)
-		{
-			String[] str = input.split("\\*");
-			ArrayList<String> answers = new ArrayList<String>();
-			for (String i : str[1].split("\\|"))
-				answers.add(i);
-			tasks.add(new Task(str[0], answers));
-			ansCount = ansCount*answers.size();
-			answersCount.add(answers.size());
-			input = reader.readLine();
-		}
-		reader.close();
+		tasks = Reader.readQuestions("Questions.txt");
 		System.out.println("Questions have done");
-		file = new File(dirPath, "Answers.txt");
-		reader = new BufferedReader(new FileReader(file));
-		answers = new String[ansCount];
-		input = reader.readLine();
-		while(null != input)
+		int ansCount = 1;
+		for(Task task : tasks)
 		{
-			String[] str = input.split("\\*");
-			String answerValue = str[0];
-			for (String i : str[1].split("\\|"))
-				answers[Integer.parseInt(i)] = answerValue;
-			input = reader.readLine();
+			answersCount.add(task.getAnswers().size());
+			ansCount = ansCount*task.getAnswers().size();
 		}
-		reader.close();
+		answers = Reader.readAnswers("Answers.txt", ansCount);
 		System.out.println("Tree has done");
-		
 	}
 	
 	public Task getNextTask()
 	{
-		return tasks.get(currentQuestionNumber++);
+		return tasks.get(++currentQuestionNumber);
 	}
 	
 	public boolean hasTask()
 	{
-		return currentQuestionNumber < tasks.size();
+		return currentQuestionNumber < tasks.size() - 1;
 	}
 	
 	public void reset()
 	{
-		currentQuestionNumber = 0;
+		currentQuestionNumber = -1;
 		result = null;
 	}
 	
@@ -150,5 +124,9 @@ public class Data
 		    }    
 		});
 		return files;
+	}
+	public int getCurrentQuestionNumber()
+	{
+		return currentQuestionNumber;
 	}
 }

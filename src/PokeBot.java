@@ -17,40 +17,41 @@ public class PokeBot extends TelegramLongPollingBot {
 
 	@Override
 	public void onUpdateReceived(Update e) {
-		System.out.println(Thread.currentThread());
-		if (e.hasMessage())
-		{
-			if(!games.containsKey(e.getMessage().getChatId().intValue()))
+		synchronized(games) {
+			if (e.hasMessage())
 			{
-				games.put(e.getMessage().getChatId().intValue(), new Game());
+				if(!games.containsKey(e.getMessage().getChatId().intValue()))
+				{
+					games.put(e.getMessage().getChatId().intValue(), new Game());
+				}
+				Message msg = e.getMessage();
+				System.out.println("Message has got. From: " + msg.getFrom().getUserName() + " Message = " + msg.getText());
+				Long chatId = msg.getChatId();
+				Game game = games.get(chatId.intValue());
+				Pair<SendMessage, SendPhoto> output = ConverterToTelegramApi.convert(game.step(msg.getText()), chatId);
+				
+				sendMsg(output);
 			}
-			Message msg = e.getMessage();
-			Long chatId = msg.getChatId();
-			Game game = games.get(chatId.intValue());
-			Pair<SendMessage, SendPhoto> output = game.step(msg);
-			
-			sendMsg(chatId, output);
-		}
-		if (e.hasCallbackQuery())
-		{
-			Long chatId = e.getCallbackQuery().getMessage().getChatId();
-			Game game = games.get(chatId.intValue());
-			Pair<SendMessage, SendPhoto> output = game.step(e.getCallbackQuery());
-			sendMsg(chatId, output);
+			if (e.hasCallbackQuery())
+			{
+				Long chatId = e.getCallbackQuery().getMessage().getChatId();
+				Game game = games.get(chatId.intValue());
+				Pair<SendMessage, SendPhoto> output = ConverterToTelegramApi.convert(game.step(e.getCallbackQuery().getData()), chatId);
+				sendMsg(output);
+			}
 		}
 	}
 
 	public String getBotToken() {
-		return "968482226:AAEyAg1bNq5uPRtenot5nEwffEwiyJKJLIY";
+		return Reader.ReadToken("Token.txt");
 	}
 	
-	private void sendMsg( Long chatId, Pair<SendMessage, SendPhoto> msg) {
+	private void sendMsg( Pair<SendMessage, SendPhoto> msg) {
 		if (msg.hasItem1())
 		{
 			try { 
 				execute(msg.getItem1());
 			} catch (TelegramApiException e1) {
-				System.out.println("Exception in execute message");
 				e1.printStackTrace();
 			}
 		}
@@ -60,7 +61,6 @@ public class PokeBot extends TelegramLongPollingBot {
 				execute(msg.getItem2());
 			} catch (Exception e1) {
 				e1.printStackTrace();
-				System.out.println("Eception in execute photo");
 			}
 		}
 	}

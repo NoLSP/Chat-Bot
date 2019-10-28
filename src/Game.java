@@ -1,27 +1,22 @@
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
-
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 public class Game 
 {
 	private Data data;
-	private boolean isPlay;
+	private boolean DeterminerPhaseContinuing;
+	private boolean DeterminerPhaseComplited;
+	private boolean isStarted;
 	private ArrayList<Integer> userAnswers;
 	private String currentQuestion;
 	private Task currentTask;
-	//private enum commands {start, end, help};
 	
 	public Game()
 	{
 		data = new Data();
-		isPlay = false;
+		DeterminerPhaseContinuing = false;
+		DeterminerPhaseComplited = false;
+		isStarted = false;
 		userAnswers = new ArrayList<Integer>();
 		currentQuestion = "";
 		currentTask = new Task();
@@ -37,77 +32,80 @@ public class Game
 		return data.getInfo();
 	}
 	
-	public Pair<SendMessage, SendPhoto> step(Message input)
+	public Pair<Pair<String, ArrayList<String>>, File> step(String input)
 	{
-		String text = input.getText();
-		Long chatId = input.getChatId();
-		switch (text)
+		switch (input)
 		{
 			case ("/start"):
-				return new Pair<SendMessage, SendPhoto>(new SendMessage().setChatId(chatId).setText(greeting()), null);
-			case ("/play"):
-				if(isPlay)
-				{
-					data.reset();
-					currentTask = data.getNextTask();
-					currentQuestion = currentTask.getQuestion();
-					userAnswers = new ArrayList<Integer>();
-					return new Pair<SendMessage, SendPhoto>(getQuestionWithKeyboard(chatId, currentQuestion, currentTask.getAnswers()), null);
-				}
+				if (isStarted)
+					return refund(greeting(), null, null);
 				else
 				{
-					currentTask = data.getNextTask();
-					currentQuestion = currentTask.getQuestion();
-					isPlay = true;
-					return new Pair<SendMessage, SendPhoto>(getQuestionWithKeyboard(chatId, currentQuestion, currentTask.getAnswers()), null);	
+					isStarted = true;
+					return refund("¬оспользуйс€ справкой\n" + help(), null, null);
 				}
+			case ("/play"):
+				data.reset();
+				currentTask = data.getNextTask();
+				currentQuestion = currentTask.getQuestion();
+				userAnswers = new ArrayList<Integer>();
+				DeterminerPhaseContinuing = true;
+				return refund(currentQuestion, currentTask.getAnswers(), null);
 			case ("/help"):
-				return new Pair<SendMessage, SendPhoto>(new SendMessage().setChatId(chatId).setText(data.getInfo()), null);
+				return refund(help(), null, null);
 		}
-		if(!isPlay) return new Pair<SendMessage, SendPhoto>(new SendMessage().setChatId(chatId).setText(help()), null);
-		else return new Pair<SendMessage, SendPhoto>(new SendMessage().setChatId(chatId).setText("Exception"), null);
+		if (DeterminerPhaseContinuing)
+			return getNextUnveilingQuestion(input);
+		//default
+		return refund("I don't know what you mean\n" + help(), null, null);
 	}
 	
-	public Pair<SendMessage, SendPhoto> step(CallbackQuery input)
+	//—ледующий определ€ющий вопрос
+	//принимает ответ пользовател€-номер варианта ответа
+	//возвращает пару: вопрос с вариантами ответов и фото
+	public Pair<Pair<String, ArrayList<String>>, File> getNextUnveilingQuestion(String input)
 	{
-		int chatId = input.getMessage().getChatId().intValue();
-		int userAnswer = Integer.parseInt(input.getData());
+		System.out.println("---Question answer processeed---");
+		//input состоит из двух цифр: номер вопроса и вариант ответа
+		int questionNumber = -1;
+		int userAnswer = -1;
+		//ќтсекаем все, кроме ответа
+		try {
+			System.out.println("Input = " + input);
+			questionNumber = Integer.parseInt(input.substring(0, 1));
+			userAnswer = Integer.parseInt(input.substring(1));
+		}
+		catch (Exception e) {
+			return refund("Ќе знаю о чем ты, воспользуйс€ справкой: /help", null, null);
+		}
+		System.out.println(data.getCurrentQuestionNumber() + " " +  questionNumber);
+		if (questionNumber != data.getCurrentQuestionNumber())
+			return refund(data.getCurrentQuestionNumber() + "ќтвечай на текущий вопрос:\n" + currentQuestion.substring(1), currentTask.getAnswers(), null);
 		userAnswers.add(userAnswer);
-		System.out.println("User answer = " + userAnswer);
+		System.out.println("User have answered " + questionNumber + " question. User answer = " + userAnswer);
 		if(data.hasTask())
 		{
 			currentTask = data.getNextTask();
 			currentQuestion = currentTask.getQuestion();
-			isPlay = true;
-			return new Pair<SendMessage, SendPhoto>(getQuestionWithKeyboard(chatId, currentQuestion, currentTask.getAnswers()), null);
+			return refund(currentQuestion, currentTask.getAnswers(), null);
 		}
 		else
 		{
-			return getResult(chatId);
+			DeterminerPhaseContinuing = false;
+			DeterminerPhaseComplited = true;
+			return getResult();
 		}
 	}
 	
-	private Pair<SendMessage, SendPhoto> getResult(long chatId) {
-		Pair<String, File> result = data.getResult( userAnswers);
-		return new Pair<SendMessage, SendPhoto>(new SendMessage().setChatId(chatId).setText(result.getItem1()),
-												new SendPhoto().setChatId(chatId).setPhoto(result.getItem2()));
+	private Pair<Pair<String, ArrayList<String>>, File> getResult() {
+		Pair<String, File> result = data.getResult(userAnswers);
+		return new Pair<Pair<String, ArrayList<String>>, File>(new Pair<String, ArrayList<String>>(result.getItem1(), null), result.getItem2());
 	}
-
-	public SendMessage getQuestionWithKeyboard(long chatId, String text, ArrayList<String> answers) 
+	
+	//¬спомогающий метод, чтобы посто€нно не писать инициализацию пары	
+	private Pair<Pair<String, ArrayList<String>>, File> refund(String message, ArrayList<String> keyboard, File photo)
 	{
-	     InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-	     List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
-	     for (String ans : answers)
-	     {
-	    	 List<InlineKeyboardButton> keyboardButtonsRow = new ArrayList<>();
-	    	 InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
-	    	 inlineKeyboardButton.setText(ans);
-	    	 inlineKeyboardButton.setCallbackData(Integer.toString(answers.indexOf(ans)));
-	    	 keyboardButtonsRow.add(inlineKeyboardButton);
-	    	 rowList.add(keyboardButtonsRow);
-	     }
-	     inlineKeyboardMarkup.setKeyboard(rowList);
-	     return new SendMessage().setChatId(chatId).setText(text).setReplyMarkup(inlineKeyboardMarkup);
+		return new Pair<Pair<String, ArrayList<String>>, File>(new Pair<String, ArrayList<String>>(message, keyboard), photo);
 	}
 	
 	public Task getTask()
