@@ -11,10 +11,11 @@ public class Data
 	private String[] answers;
 	private ArrayList<Integer> answersCount;
 	private int currentQuestionNumber;
-	private Pair<String, File> result;
+	private Pokemon result;
 	private String Info = "Вот что я умею:\n"
 			+ "/play - начать игру\n"
-			+ "/help - справка\n"; 
+			+ "/help - справка\n"
+			+ "/fight - начать бой\n"; 
 	
 	public Data()
 	{
@@ -71,18 +72,22 @@ public class Data
 
 	public Pair<String, File> getResult(ArrayList<Integer> userAnswers) {
 		if (result != null)
-			return result;
+			return new Pair<String, File>(result.getName(), result.getPhoto());
 		String pokeName = getPokeName(userAnswers);
 		if( pokeName == null)
 		{
 			result = getRandomPokemon();
-			return result;
+			return new Pair<String, File>("Вот тебе рандомный: " + result.getName(), result.getPhoto());
 		}
 		else
 		{
-			result =  new Pair<String, File>("Поздравляем, ты: " + pokeName, 
-							new File(new File("").getAbsolutePath()+ "/pictures/" + pokeName + ".jpg"));
-			return result;
+		
+			try {
+				result =  Reader.readPoke(new File("").getAbsolutePath() + "\\PokeInfo\\" + pokeName + ".txt");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return new Pair<String, File>("Поздравляем, ты: " + result.getName(), result.getPhoto());
 		}	
 	}
 	
@@ -99,28 +104,31 @@ public class Data
 		return answers[result];
 	}
 
-	private Pair<String, File> getRandomPokemon() 
+	public Pokemon getRandomPokemon()
 	{
-		File rndPhoto = getRandomPhoto(new File("").getAbsolutePath()+ "/pictures/");
-		String pokemonName = rndPhoto.getName().substring(0, rndPhoto.getName().length()-4);
-		return new Pair<String, File>("К сожалению не существует покемонов, подходящих тебе\nВот тебе рандомный: " + pokemonName, 
-						rndPhoto);
+		String rndPokeName = getRandomFileName(new File("").getAbsolutePath()+ "/PokeInfo/");
+		try {
+			return Reader.readPoke(new File("").getAbsolutePath() + "/PokeInfo/" + rndPokeName);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
-	private File getRandomPhoto(String path)
+	private String getRandomFileName(String path)
 	{
-		String[] filesNames = getPhotoNameList(path);
+		String[] filesNames = getFileList(path);
 		MyRandom rnd = new MyRandom(filesNames.length-1);
 		int index = rnd.next();
-		return new File(path + filesNames[index]);
+		return filesNames[index];
 	}	
 	
-	private String[] getPhotoNameList(String path)
+	private String[] getFileList(String path)
 	{
 		File folder = new File(path);
 		String[] files = folder.list(new FilenameFilter() {
 			@Override public boolean accept(File folder, String name) {
-				return name.endsWith(".jpg");
+				return name.endsWith(".txt");
 		    }    
 		});
 		return files;
@@ -128,5 +136,10 @@ public class Data
 	public int getCurrentQuestionNumber()
 	{
 		return currentQuestionNumber;
+	}
+	
+	public Pokemon getCurrentPokemon()
+	{
+		return result;
 	}
 }

@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class PokeBot extends TelegramLongPollingBot {
-	private HashMap<Integer, Game> games = new HashMap<Integer, Game>();
+	private HashMap<String, Game> games = new HashMap<String, Game>();
 	
 	@Override
 	public String getBotUsername() {
@@ -20,14 +20,15 @@ public class PokeBot extends TelegramLongPollingBot {
 		synchronized(games) {
 			if (e.hasMessage())
 			{
-				if(!games.containsKey(e.getMessage().getChatId().intValue()))
+				System.out.println(games.toString());
+				if(!games.containsKey(e.getMessage().getFrom().getFirstName()))
 				{
-					games.put(e.getMessage().getChatId().intValue(), new Game());
+					games.put(e.getMessage().getFrom().getFirstName(), new Game());
 				}
 				Message msg = e.getMessage();
 				System.out.println("Message has got. From: " + msg.getFrom().getUserName() + " Message = " + msg.getText());
 				Long chatId = msg.getChatId();
-				Game game = games.get(chatId.intValue());
+				Game game = games.get(msg.getFrom().getFirstName());
 				Pair<SendMessage, SendPhoto> output = ConverterToTelegramApi.convert(game.step(msg.getText()), chatId);
 				
 				sendMsg(output);
@@ -35,7 +36,7 @@ public class PokeBot extends TelegramLongPollingBot {
 			if (e.hasCallbackQuery())
 			{
 				Long chatId = e.getCallbackQuery().getMessage().getChatId();
-				Game game = games.get(chatId.intValue());
+				Game game = games.get(e.getCallbackQuery().getFrom().getFirstName());
 				Pair<SendMessage, SendPhoto> output = ConverterToTelegramApi.convert(game.step(e.getCallbackQuery().getData()), chatId);
 				sendMsg(output);
 			}

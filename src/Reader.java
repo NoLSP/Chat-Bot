@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import bsh.EvalError;
+
 public final class Reader{
 
 	public static String[] readAnswers(String fileName,int ansCount) throws IOException {
@@ -59,6 +61,48 @@ public final class Reader{
 			e.printStackTrace();
 		}
 		return input;
+	}
+	
+	public static Pokemon readPoke(String filePath) throws IOException
+	{
+		File file = new File(filePath);
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		String input = reader.readLine();
+		String[] str = input.split("\\*");
+		Pokemon poke = new Pokemon(file.getName().substring(0, file.getName().length() - 4), str[0]);
+		String[] chcs = str[1].split("\\|");
+		int[] characteristics = new int[chcs.length];
+		for(int i = 0; i < chcs.length; i++)
+		{
+			characteristics[i] = Integer.parseInt(chcs[i]);
+		}
+		poke.setCharasteristics(characteristics);
+		String[] skillsPaths = str[2].split("\\|");
+		ArrayList<Skill> skills = new ArrayList<Skill>();
+		for(int i = 0; i < skillsPaths.length; i++)
+		{
+			try {
+				skills.add(readSkill(new File("").getAbsolutePath() + "\\PokeInfo\\Skills\\" + skillsPaths[i]+ ".txt"));
+			} catch (EvalError e) {
+				System.out.println("Can't read skill file: " + skillsPaths[i]);
+			}
+		}
+		poke.setSkills(skills);
+		poke.setPhoto(new File("PokeInfo/pictures/" + file.getName().substring(0, file.getName().length() - 4) + ".jpg"));
+		reader.close();
+		return poke;
+	}
+	
+	private static Skill readSkill(String filePath) throws EvalError, IOException
+	{
+		File file = new File(filePath);
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		String input = reader.readLine();
+		String[] str = input.split("\\*");
+		Skill skill = new Skill(file.getName().substring(0, file.getName().length() - 4), str[0], Integer.parseInt(str[2]));
+		skill.setCoefficients(str[1]);
+		reader.close();
+		return skill;
 	}
 
 }

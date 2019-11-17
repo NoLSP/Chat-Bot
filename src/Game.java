@@ -1,24 +1,24 @@
 import java.io.File;
 import java.util.ArrayList;
+enum Phase { None, Determine, Fight}
 
 public class Game 
 {
 	private Data data;
-	private boolean DeterminerPhaseContinuing;
-	private boolean DeterminerPhaseComplited;
+	private Determiner determiner;
+	private Fight fight;
+	private Phase phase;
 	private boolean isStarted;
-	private ArrayList<Integer> userAnswers;
-	private String currentQuestion;
 	private Task currentTask;
 	
 	public Game()
 	{
 		data = new Data();
-		DeterminerPhaseContinuing = false;
-		DeterminerPhaseComplited = false;
+		determiner = new Determiner(data);
+		fight = null;
+		phase = Phase.None;
 		isStarted = false;
-		userAnswers = new ArrayList<Integer>();
-		currentQuestion = "";
+
 		currentTask = new Task();
 	}
 	
@@ -32,80 +32,43 @@ public class Game
 		return data.getInfo();
 	}
 	
-	public Pair<Pair<String, ArrayList<String>>, File> step(String input)
+	public OutputData step(String input)
 	{
 		switch (input)
 		{
 			case ("/start"):
 				if (isStarted)
-					return refund(greeting(), null, null);
+					return new OutputData(greeting());
 				else
 				{
 					isStarted = true;
-					return refund("Воспользуйся справкой\n" + help(), null, null);
+					return new OutputData("Воспользуйся справкой\n" + help());
 				}
 			case ("/play"):
 				data.reset();
-				currentTask = data.getNextTask();
-				currentQuestion = currentTask.getQuestion();
-				userAnswers = new ArrayList<Integer>();
-				DeterminerPhaseContinuing = true;
-				return refund(currentQuestion, currentTask.getAnswers(), null);
+				phase = Phase.Determine;
+				return determiner.next(input);
 			case ("/help"):
-				return refund(help(), null, null);
-		}
-		if (DeterminerPhaseContinuing)
-			return getNextUnveilingQuestion(input);
+				return new OutputData(help());
+			case ("/fight"):
+				if (!determiner.isComplited())
+					return new OutputData("Покемон еще не выбран.\n" + help());	
+				if (phase == Phase.Fight)
+					return fight.next(input);
+				else
+				{
+					fight = new Fight(data.getCurrentPokemon(), data);
+					phase = Phase.Fight;
+					return fight.next(input);
+				}
+					
+		}			
+		if (phase == Phase.Determine)
+			return determiner.next(input);
+		if (phase == Phase.Fight)
+			return fight.next(input);
 		//default
-		return refund("I don't know what you mean\n" + help(), null, null);
-	}
-	
-	//Следующий определяющий вопрос
-	//принимает ответ пользователя-номер варианта ответа
-	//возвращает пару: вопрос с вариантами ответов и фото
-	public Pair<Pair<String, ArrayList<String>>, File> getNextUnveilingQuestion(String input)
-	{
-		System.out.println("---Question answer processeed---");
-		//input состоит из двух цифр: номер вопроса и вариант ответа
-		int questionNumber = -1;
-		int userAnswer = -1;
-		//Отсекаем все, кроме ответа
-		try {
-			System.out.println("Input = " + input);
-			questionNumber = Integer.parseInt(input.substring(0, 1));
-			userAnswer = Integer.parseInt(input.substring(1));
-		}
-		catch (Exception e) {
-			return refund("Не знаю о чем ты, воспользуйся справкой: /help", null, null);
-		}
-		System.out.println(data.getCurrentQuestionNumber() + " " +  questionNumber);
-		if (questionNumber != data.getCurrentQuestionNumber())
-			return refund(data.getCurrentQuestionNumber() + "Отвечай на текущий вопрос:\n" + currentQuestion.substring(1), currentTask.getAnswers(), null);
-		userAnswers.add(userAnswer);
-		System.out.println("User have answered " + questionNumber + " question. User answer = " + userAnswer);
-		if(data.hasTask())
-		{
-			currentTask = data.getNextTask();
-			currentQuestion = currentTask.getQuestion();
-			return refund(currentQuestion, currentTask.getAnswers(), null);
-		}
-		else
-		{
-			DeterminerPhaseContinuing = false;
-			DeterminerPhaseComplited = true;
-			return getResult();
-		}
-	}
-	
-	private Pair<Pair<String, ArrayList<String>>, File> getResult() {
-		Pair<String, File> result = data.getResult(userAnswers);
-		return new Pair<Pair<String, ArrayList<String>>, File>(new Pair<String, ArrayList<String>>(result.getItem1(), null), result.getItem2());
-	}
-	
-	//Вспомогающий метод, чтобы постоянно не писать инициализацию пары	
-	private Pair<Pair<String, ArrayList<String>>, File> refund(String message, ArrayList<String> keyboard, File photo)
-	{
-		return new Pair<Pair<String, ArrayList<String>>, File>(new Pair<String, ArrayList<String>>(message, keyboard), photo);
+		return new OutputData("Не понимаю, что ты хочешь\n" + help());
 	}
 	
 	public Task getTask()

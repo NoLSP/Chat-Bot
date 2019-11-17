@@ -1,4 +1,3 @@
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,21 +8,21 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 public final class ConverterToTelegramApi {
 	
-	public static Pair<SendMessage, SendPhoto> convert( Pair<Pair<String, ArrayList<String>>, File> input, long chatId)
+	public static Pair<SendMessage, SendPhoto> convert( OutputData input, long chatId)
 	{
 		SendMessage message = null;
 		SendPhoto photo = null;
-		if ( input.hasItem1())
+		if ( input.hasMessage())
 		{
-			if (input.getItem1().hasBoth())
+			if (input.hasKeyboard())
 			{
-				message = getQuestionWithKeyboard(chatId, input.getItem1().getItem1(), input.getItem1().getItem2());
+				message = getQuestionWithKeyboard(chatId, input.getMessage(), input.getKeyboard());
 			}
 			else
-				message = new SendMessage().setChatId(chatId).setText(input.getItem1().getItem1());
+				message = new SendMessage().setChatId(chatId).setText(input.getMessage());
 		}
-		if( input.hasItem2())
-			photo = new SendPhoto().setChatId(chatId).setPhoto(input.getItem2());
+		if( input.hasImage())
+			photo = new SendPhoto().setChatId(chatId).setPhoto(input.getImage());
 		return new Pair<SendMessage, SendPhoto>( message, photo);
 	}
 	
