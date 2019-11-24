@@ -14,19 +14,28 @@ public final class ConverterToTelegramApi {
 		SendPhoto photo = null;
 		if ( input.hasMessage())
 		{
+			String text = "";
+			for (int i = 0; i < input.getMessage().size(); i++)
+			{
+				if (i != 0) text = text + "\n";
+				text = text + input.getMessage().get(i);
+			}
 			if (input.hasKeyboard())
 			{
-				message = getQuestionWithKeyboard(chatId, input.getMessage(), input.getKeyboard());
+				message = getQuestionWithKeyboard(input.getQuestionNumber(), chatId, text, input.getKeyboard());
 			}
 			else
-				message = new SendMessage().setChatId(chatId).setText(input.getMessage());
+			{
+				
+				message = new SendMessage().setChatId(chatId).setText(text);
+			}
 		}
 		if( input.hasImage())
 			photo = new SendPhoto().setChatId(chatId).setPhoto(input.getImage());
 		return new Pair<SendMessage, SendPhoto>( message, photo);
 	}
 	
-	private static SendMessage getQuestionWithKeyboard(long chatId, String text, ArrayList<String> answers) 
+	private static SendMessage getQuestionWithKeyboard(int questionNumber, long chatId, String text, List<String> answers) 
 	{
 	     InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
 	     List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
@@ -35,11 +44,11 @@ public final class ConverterToTelegramApi {
 	    	 List<InlineKeyboardButton> keyboardButtonsRow = new ArrayList<>();
 	    	 InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
 	    	 inlineKeyboardButton.setText(ans);
-	    	 inlineKeyboardButton.setCallbackData(text.substring(0, 1) + Integer.toString(answers.indexOf(ans)));
+	    	 inlineKeyboardButton.setCallbackData(questionNumber + Integer.toString(answers.indexOf(ans)));
 	    	 keyboardButtonsRow.add(inlineKeyboardButton);
 	    	 rowList.add(keyboardButtonsRow);
 	     }
 	     inlineKeyboardMarkup.setKeyboard(rowList);
-	     return new SendMessage().setChatId(chatId).setText(text.substring(1)).setReplyMarkup(inlineKeyboardMarkup);
+	     return new SendMessage().setChatId(chatId).setText(text).setReplyMarkup(inlineKeyboardMarkup);
 	}
 }

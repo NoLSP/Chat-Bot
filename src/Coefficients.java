@@ -24,6 +24,22 @@ public class Coefficients {
 		this.forDefence = forDefence;		
 	}
 	
+	public Coefficients(String str)
+	{
+		String[] inputData = str.split("\\|");
+		//Коэффициенты способности
+		double myH = Double.parseDouble(inputData[0]);
+		double mySpd = Double.parseDouble(inputData[1]);
+		double myI = Double.parseDouble(inputData[2]);
+		double myStr = Double.parseDouble(inputData[3]);
+		double myD = Double.parseDouble(inputData[4]);
+		forHealth = myH;
+		forSpeed = mySpd;
+		forIntellect = myI;
+		forStrength = myStr;
+		forDefence = myD;
+	}
+	
 	public double[] getArray()
 	{
 		return new double[] {forHealth, forSpeed, forIntellect, forStrength, forDefence};

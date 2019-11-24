@@ -1,6 +1,7 @@
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Fight {
 	private Pokemon myPoke;
@@ -46,13 +47,13 @@ public class Fight {
 			//код ответа имеет следующую структуру: первая цифра - номер вопроса; 
 			//вторая - номер варианта ответа, который выбрал юзер
 			//нужно это для отслеживания, на нужный впрос ли ответил юзер
-			if("00".equals(input))
+			if("00".equals(input) || "11".equals(input))
 			{				
 				enemy = data.getRandomPokemon();
 				ArrayList<String> answers = new ArrayList<String>();
 				answers.add("Да");
 				answers.add("Нет");
-				return new OutputData("1Твой противник: " + enemy.getName() + "\n\n" + enemy.getInfo() + "\n\nУстраивает?", answers, enemy.getPhoto());
+				return new OutputData(1, Arrays.asList("Твой противник: " + enemy.getName(), "\n", enemy.getInfo(), "Устраивает?"), answers, enemy.getPhoto());
 			}
 			if("01".equals(input))
 				return new OutputData("Этот модуль еще в разработке");
@@ -64,14 +65,6 @@ public class Fight {
 					return userTurn(0);
 				else
 					return enemyTurn();
-			}
-			if ("11".equals(input))
-			{
-				enemy = data.getRandomPokemon();
-				ArrayList<String> answers = new ArrayList<String>();
-				answers.add("Да");
-				answers.add("Нет");
-				return  new OutputData("1Твой противник: " + enemy.getName() + "\n\n" + enemy.getInfo() + "\n\nУстраивает?", answers, enemy.getPhoto());
 			}
 		}
 		if("5".equals(input.substring(0, 1)))
@@ -87,16 +80,20 @@ public class Fight {
 	private OutputData enemyTurn() 
 	{
 		int damage = enemy.useRandomSkill(myPoke.getCharacteristics());
+		myPoke.hurt(damage);
 		isMyTurn = true;
-		return new OutputData("5Противник нанес урон: (" + damage + ") ед.\nТвой ход!", myPoke.getSkillsList());
+		return new OutputData(5, Arrays.asList("Противник нанес урон: (" + damage + ") ед.", "Твой ход!"), myPoke.getSkillsList());
 	}
 
 	private OutputData userTurn(int skillIndex) {
 		int damage = myPoke.useSkill(skillIndex, enemy.getCharacteristics());
+		enemy.hurt(damage);
 		isMyTurn = false;
 		OutputData enemyTurn = enemyTurn();
 		isMyTurn = true;
-		return new OutputData("5Твой покемон нанес урон: (" + damage + ") ед.\nХод противника!\n\n" + enemyTurn.getMessage(), myPoke.getSkillsList());
+		List<String> text = Arrays.asList("Твой покемон нанес урон: (" + damage + ") ед.", "Ход противника!");
+		text.addAll(enemyTurn.getMessage());
+		return new OutputData(5, text, myPoke.getSkillsList());
 	}
 
 	private OutputData choseEnemy() 
@@ -104,6 +101,6 @@ public class Fight {
 		ArrayList<String> answers = new ArrayList<String>();
 		answers.add("Случайный противник");
 		answers.add("Пользователь");
-		return new OutputData("0С кем желаешь сразиться?", answers);
+		return new OutputData(0, Arrays.asList("С кем желаешь сразиться?"), answers);
 	}
 }

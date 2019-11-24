@@ -1,5 +1,6 @@
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Determiner {
 	private Data data;
@@ -30,7 +31,7 @@ public class Determiner {
 			userAnswers = new ArrayList<Integer>();
 			currentTask = data.getNextTask();
 			currentQuestion = currentTask.getQuestion();
-			return new OutputData(currentQuestion, currentTask.getAnswers());
+			return new OutputData(data.getCurrentQuestionNumber(), Arrays.asList(currentQuestion), currentTask.getAnswers());
 		}
 		else
 			return getNextQuestion(input);
@@ -53,14 +54,14 @@ public class Determiner {
 		}
 		System.out.println(data.getCurrentQuestionNumber() + " " +  questionNumber);
 		if (questionNumber != data.getCurrentQuestionNumber())
-			return new OutputData(data.getCurrentQuestionNumber() + "Отвечай на текущий вопрос:\n" + currentQuestion.substring(1), currentTask.getAnswers());
+			return new OutputData(data.getCurrentQuestionNumber(), Arrays.asList("Отвечай на текущий вопрос:", currentQuestion), currentTask.getAnswers());
 		userAnswers.add(userAnswer);
 		System.out.println("User have answered " + questionNumber + " question. User answer = " + userAnswer);
 		if(data.hasTask())
 		{
 			currentTask = data.getNextTask();
 			currentQuestion = currentTask.getQuestion();
-			return new OutputData(currentQuestion, currentTask.getAnswers());
+			return new OutputData(data.getCurrentQuestionNumber(), Arrays.asList(currentQuestion), currentTask.getAnswers());
 		}
 		else
 		{
@@ -71,6 +72,6 @@ public class Determiner {
 	
 	private OutputData getResult() {
 		Pair<String, File> result = data.getResult(userAnswers);
-		return new OutputData(result.getItem1(), null, result.getItem2());
+		return new OutputData(Arrays.asList(result.getItem1()), result.getItem2());
 	}
 }

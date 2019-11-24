@@ -15,7 +15,7 @@ public class Data
 	private String Info = "Вот что я умею:\n"
 			+ "/play - начать игру\n"
 			+ "/help - справка\n"
-			+ "/fight - начать бой\n"; 
+			+ "/fight - начать бой"; 
 	
 	public Data()
 	{

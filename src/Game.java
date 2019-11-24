@@ -8,7 +8,6 @@ public class Game
 	private Determiner determiner;
 	private Fight fight;
 	private Phase phase;
-	private boolean isStarted;
 	private Task currentTask;
 	
 	public Game()
@@ -17,7 +16,6 @@ public class Game
 		determiner = new Determiner(data);
 		fight = null;
 		phase = Phase.None;
-		isStarted = false;
 
 		currentTask = new Task();
 	}
@@ -37,13 +35,7 @@ public class Game
 		switch (input)
 		{
 			case ("/start"):
-				if (isStarted)
 					return new OutputData(greeting());
-				else
-				{
-					isStarted = true;
-					return new OutputData("Воспользуйся справкой\n" + help());
-				}
 			case ("/play"):
 				data.reset();
 				phase = Phase.Determine;
@@ -60,8 +52,7 @@ public class Game
 					fight = new Fight(data.getCurrentPokemon(), data);
 					phase = Phase.Fight;
 					return fight.next(input);
-				}
-					
+				}			
 		}			
 		if (phase == Phase.Determine)
 			return determiner.next(input);

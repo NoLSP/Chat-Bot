@@ -5,8 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import bsh.EvalError;
-
 public final class Reader{
 
 	public static String[] readAnswers(String fileName,int ansCount) throws IOException {
@@ -83,7 +81,7 @@ public final class Reader{
 		{
 			try {
 				skills.add(readSkill(new File("").getAbsolutePath() + "\\PokeInfo\\Skills\\" + skillsPaths[i]+ ".txt"));
-			} catch (EvalError e) {
+			} catch (IOException e) {
 				System.out.println("Can't read skill file: " + skillsPaths[i]);
 			}
 		}
@@ -93,7 +91,7 @@ public final class Reader{
 		return poke;
 	}
 	
-	private static Skill readSkill(String filePath) throws EvalError, IOException
+	private static Skill readSkill(String filePath) throws IOException
 	{
 		File file = new File(filePath);
 		BufferedReader reader = new BufferedReader(new FileReader(file));

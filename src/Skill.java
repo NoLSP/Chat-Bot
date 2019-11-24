@@ -34,20 +34,12 @@ public class Skill {
 		double defenceEffect = 1 - enemyChrs.getDefence()/100;
 		int speedEffect = 1;// to do
 		
-		enemyChrs.reduceHealth((int) (damage * defenceEffect * speedEffect));
 		return (int) (damage * defenceEffect * speedEffect);
 	}
 	
 	public void setCoefficients(String str)
 	{
-		String[] inputData = str.split("\\|");
-		//Коэффициенты способности
-		double myH = Double.parseDouble(inputData[0]);
-		double myStr = Double.parseDouble(inputData[1]);
-		double myD = Double.parseDouble(inputData[2]);
-		double mySpd = Double.parseDouble(inputData[3]);
-		double myI = Double.parseDouble(inputData[4]);
-		coefficients = new Coefficients(myH, mySpd, myI, myStr, myD);
+		coefficients = new Coefficients(str);
 	}
 
 	public String getName() {

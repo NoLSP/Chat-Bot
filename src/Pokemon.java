@@ -1,17 +1,18 @@
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Pokemon {
 	private String name;
 	private String info;
 	private File photo;
-	private ArrayList<Skill> skills;
+	private List<Skill> skills;
 	private Characteristics characteristics;
 	
-	public Pokemon(String nm, String inf)
+	public Pokemon(String name, String info)
 	{
-		name = nm;
-		info = inf;
+		this.name = name;
+		this.info = info;
 	}
 	
 	public void setPhoto(File ph)
@@ -19,9 +20,9 @@ public class Pokemon {
 		photo = ph;
 	}
 	
-	public void setSkills(ArrayList<Skill> skls)
+	public void setSkills(ArrayList<Skill> skills)
 	{
-		skills = skls;
+		this.skills = skills;
 	}
 	
 	public void setCharasteristics(int[] chcs)
@@ -69,12 +70,12 @@ public class Pokemon {
 		return characteristics.getDefence();
 	}
 	
-	public ArrayList<Skill> getSkills()
+	public List<Skill> getSkills()
 	{
 		return skills;
 	}
 	
-	public ArrayList<String> getSkillsList()
+	public List<String> getSkillsList()
 	{
 		ArrayList<String> list = new ArrayList<String>();
 		for(Skill skill : skills)
