@@ -1,14 +1,17 @@
-import java.io.File;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 enum Phase { None, Determine, Fight}
 
 public class Game 
 {
 	private Data data;
 	private Determiner determiner;
-	private Fight fight;
+	private Fighter fight;
 	private Phase phase;
 	private Task currentTask;
+	
+	private static final int FIGHT_PHASE_CODE = 400;
 	
 	public Game()
 	{
@@ -30,36 +33,40 @@ public class Game
 		return data.getInfo();
 	}
 	
-	public OutputData step(String input)
+	public List<OutputData> step(InputData input)
 	{
-		switch (input)
+		switch (input.getData())
 		{
 			case ("/start"):
-					return new OutputData(greeting());
+					return Arrays.asList(new OutputData(input.getChatId(), greeting()));
 			case ("/play"):
-				data.reset();
 				phase = Phase.Determine;
-				return determiner.next(input);
+				return Arrays.asList(determiner.next(input));
 			case ("/help"):
-				return new OutputData(help());
+				return Arrays.asList(new OutputData(input.getChatId(), help()));
 			case ("/fight"):
 				if (!determiner.isComplited())
-					return new OutputData("Покемон еще не выбран.\n" + help());	
+					return Arrays.asList(new OutputData(input.getChatId(), "Покемон еще не выбран.\n" + help()));	
 				if (phase == Phase.Fight)
 					return fight.next(input);
 				else
 				{
-					fight = new Fight(data.getCurrentPokemon(), data);
+					fight = new Fighter(data.getCurrentPokemon(), data);
 					phase = Phase.Fight;
 					return fight.next(input);
 				}			
-		}			
+		}
+		if ( (FIGHT_PHASE_CODE + "").equalsIgnoreCase(input.getData().substring(0, 3)))
+		{	
+			fight = new Fighter(data.getCurrentPokemon(), data);
+			phase = Phase.Fight;
+		}
 		if (phase == Phase.Determine)
-			return determiner.next(input);
+			return Arrays.asList(determiner.next(input));
 		if (phase == Phase.Fight)
 			return fight.next(input);
 		//default
-		return new OutputData("Не понимаю, что ты хочешь\n" + help());
+		return Arrays.asList(new OutputData(input.getChatId(), "Не понимаю, что ты хочешь\n" + help()));
 	}
 	
 	public Task getTask()

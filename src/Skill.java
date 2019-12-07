@@ -21,7 +21,7 @@ public class Skill {
 		return movesBeforeRecovery == 0;
 	}
 	
-	//наносит урон противнику и возвращает количество урона
+	//возвращает количество урона
 	public int use(Characteristics myChrs, Characteristics enemyChrs)
 	{
 		double healthComponent = coefficients.forHealth() * myChrs.getHealth();
@@ -32,8 +32,12 @@ public class Skill {
 
 		double damage = healthComponent + speedComponent + intellectComponent + strengthComponent + defenceComponent;
 		double defenceEffect = 1 - enemyChrs.getDefence()/100;
-		int speedEffect = 1;// to do
+		boolean bSpeedEffect = ((Math.random()* myChrs.getSpeed())>=(Math.random() * enemyChrs.getSpeed())); 
+		int speedEffect = 0; 
+		if (bSpeedEffect) 
+		speedEffect = 1;
 		
+		movesBeforeRecovery = coolDown;
 		return (int) (damage * defenceEffect * speedEffect);
 	}
 	
@@ -44,5 +48,10 @@ public class Skill {
 
 	public String getName() {
 		return name;
+	}
+
+	public void refresh() {
+		if (movesBeforeRecovery > 0) movesBeforeRecovery--;
+		
 	}
 }

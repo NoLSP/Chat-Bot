@@ -9,6 +9,8 @@ public class Determiner {
 	private Task currentTask;
 	private boolean DeterminerPhaseComplited;
 	
+	private static final int DETERMINER_PHASE_CODE = 100;
+	
 	public Determiner(Data dt)
 	{
 		data = dt;
@@ -23,21 +25,22 @@ public class Determiner {
 		return DeterminerPhaseComplited;
 	}
 	
-	public OutputData next(String input)
+	public OutputData next(InputData input)
 	{
-		if ("/play".equals(input))
+		if ("/play".equals(input.getData()))
 		{
+			data.reset();
 			DeterminerPhaseComplited = false;
 			userAnswers = new ArrayList<Integer>();
 			currentTask = data.getNextTask();
 			currentQuestion = currentTask.getQuestion();
-			return new OutputData(data.getCurrentQuestionNumber(), Arrays.asList(currentQuestion), currentTask.getAnswers());
+			return new OutputData(input.getChatId(), DETERMINER_PHASE_CODE + data.getCurrentQuestionNumber(), Arrays.asList(currentQuestion), currentTask.getAnswers());
 		}
 		else
 			return getNextQuestion(input);
 	}
 	
-	private OutputData getNextQuestion(String input)
+	private OutputData getNextQuestion(InputData input)
 	{
 		System.out.println("---Question answer processeed---");
 		//input состоит из двух цифр: номер вопроса и вариант ответа
@@ -46,32 +49,32 @@ public class Determiner {
 		//Отсекаем все, кроме ответа
 		try {
 			System.out.println("Input = " + input);
-			questionNumber = Integer.parseInt(input.substring(0, 1));
-			userAnswer = Integer.parseInt(input.substring(1));
+			questionNumber = Integer.parseInt(input.getData().substring(0, input.getData().indexOf('.')));
+			userAnswer = Integer.parseInt(input.getData().substring(input.getData().indexOf('.') + 1));
 		}
 		catch (Exception e) {
-			return new OutputData("Не знаю о чем ты, воспользуйся справкой: /help");
+			return new OutputData(input.getChatId(), "Не знаю о чем ты, воспользуйся справкой: /help");
 		}
 		System.out.println(data.getCurrentQuestionNumber() + " " +  questionNumber);
-		if (questionNumber != data.getCurrentQuestionNumber())
-			return new OutputData(data.getCurrentQuestionNumber(), Arrays.asList("Отвечай на текущий вопрос:", currentQuestion), currentTask.getAnswers());
+		if (questionNumber != DETERMINER_PHASE_CODE + data.getCurrentQuestionNumber())
+			return new OutputData(input.getChatId(), DETERMINER_PHASE_CODE + data.getCurrentQuestionNumber(), Arrays.asList("Отвечай на текущий вопрос:", currentQuestion), currentTask.getAnswers());
 		userAnswers.add(userAnswer);
 		System.out.println("User have answered " + questionNumber + " question. User answer = " + userAnswer);
 		if(data.hasTask())
 		{
 			currentTask = data.getNextTask();
 			currentQuestion = currentTask.getQuestion();
-			return new OutputData(data.getCurrentQuestionNumber(), Arrays.asList(currentQuestion), currentTask.getAnswers());
+			return new OutputData(input.getChatId(), DETERMINER_PHASE_CODE + data.getCurrentQuestionNumber(), Arrays.asList(currentQuestion), currentTask.getAnswers());
 		}
 		else
 		{
 			DeterminerPhaseComplited = true;
-			return getResult();
+			return getResult(input.getChatId());
 		}
 	}
 	
-	private OutputData getResult() {
+	private OutputData getResult(Long chatId) {
 		Pair<String, File> result = data.getResult(userAnswers);
-		return new OutputData(Arrays.asList(result.getItem1()), result.getItem2());
+		return new OutputData(chatId, Arrays.asList(result.getItem1()), result.getItem2());
 	}
 }

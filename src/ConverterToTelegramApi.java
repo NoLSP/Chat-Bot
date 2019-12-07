@@ -8,34 +8,41 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 public final class ConverterToTelegramApi {
 	
-	public static Pair<SendMessage, SendPhoto> convert( OutputData input, long chatId)
+	public static ArrayList<Pair<SendMessage, SendPhoto>> convert( List<OutputData> input)
 	{
-		SendMessage message = null;
-		SendPhoto photo = null;
-		if ( input.hasMessage())
+		ArrayList<Pair<SendMessage, SendPhoto>> output = new ArrayList<Pair<SendMessage, SendPhoto>>();
+		for (OutputData data : input)
 		{
-			String text = "";
-			for (int i = 0; i < input.getMessage().size(); i++)
+			SendMessage message = null;
+			SendPhoto photo = null;
+			Long chatId = data.getChatId();
+			if ( data.hasMessage())
 			{
-				if (i != 0) text = text + "\n";
-				text = text + input.getMessage().get(i);
+				String text = "";
+				for (int i = 0; i < data.getMessage().size(); i++)
+				{
+					if (i != 0) text = text + "\n";
+					text = text + data.getMessage().get(i);
+				}
+				if (data.hasKeyboard())
+				{
+					message = getQuestionWithKeyboard(data.getId(), chatId, text, data.getKeyboard());
+				}
+				else
+				{
+					
+					message = new SendMessage().setChatId(chatId).setText(text);
+				}
 			}
-			if (input.hasKeyboard())
-			{
-				message = getQuestionWithKeyboard(input.getQuestionNumber(), chatId, text, input.getKeyboard());
-			}
-			else
-			{
-				
-				message = new SendMessage().setChatId(chatId).setText(text);
-			}
+			if( data.hasImage())
+				photo = new SendPhoto().setChatId(chatId).setPhoto(data.getImage());
+			output.add(new Pair<SendMessage, SendPhoto>(message, photo));
 		}
-		if( input.hasImage())
-			photo = new SendPhoto().setChatId(chatId).setPhoto(input.getImage());
-		return new Pair<SendMessage, SendPhoto>( message, photo);
+		
+		return output;
 	}
 	
-	private static SendMessage getQuestionWithKeyboard(int questionNumber, long chatId, String text, List<String> answers) 
+	private static SendMessage getQuestionWithKeyboard(int questionId, long chatId, String text, List<String> answers) 
 	{
 	     InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
 	     List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
@@ -44,7 +51,7 @@ public final class ConverterToTelegramApi {
 	    	 List<InlineKeyboardButton> keyboardButtonsRow = new ArrayList<>();
 	    	 InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
 	    	 inlineKeyboardButton.setText(ans);
-	    	 inlineKeyboardButton.setCallbackData(questionNumber + Integer.toString(answers.indexOf(ans)));
+	    	 inlineKeyboardButton.setCallbackData(questionId + "." + Integer.toString(answers.indexOf(ans)));
 	    	 keyboardButtonsRow.add(inlineKeyboardButton);
 	    	 rowList.add(keyboardButtonsRow);
 	     }

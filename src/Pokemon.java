@@ -91,7 +91,7 @@ public class Pokemon {
 		Skill skill = skills.get(skillIndex);
 			if(skill.isReady())
 				return skill.use(characteristics, enemyChrs);
-		return 0;
+		return -1;
 	}
 	
 	public int useRandomSkill(Characteristics enemyChrs) {
@@ -100,9 +100,15 @@ public class Pokemon {
 				return skill.use(characteristics, enemyChrs);
 		return 0;
 	}
+	
+	public void refreshSkills()
+	{
+		for( Skill skill : skills)
+			skill.refresh();
+	}
 
 	public boolean isDead() {
-		return characteristics.getHealth() == 0;
+		return characteristics.getHealth() <= 0;
 	}
 
 	public Characteristics getCharacteristics() {

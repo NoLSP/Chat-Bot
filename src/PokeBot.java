@@ -1,4 +1,5 @@
 import java.util.HashMap;
+import java.util.List;
 
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -21,23 +22,27 @@ public class PokeBot extends TelegramLongPollingBot {
 			if (e.hasMessage())
 			{
 				System.out.println(games.toString());
-				if(!games.containsKey(e.getMessage().getFrom().getFirstName()))
+				if(!games.containsKey(e.getMessage().getFrom().getUserName()))
 				{
-					games.put(e.getMessage().getFrom().getFirstName(), new Game());
+					String userName = e.getMessage().getFrom().getUserName();
+					games.put(userName, new Game());
+					Arena.addPlayerData(userName, e.getMessage().getChatId());
 				}
 				Message msg = e.getMessage();
 				System.out.println("Message has got. From: " + msg.getFrom().getUserName() + " Message = " + msg.getText());
 				Long chatId = msg.getChatId();
-				Game game = games.get(msg.getFrom().getFirstName());
-				Pair<SendMessage, SendPhoto> output = ConverterToTelegramApi.convert(game.step(msg.getText()), chatId);
+				String fromUser = msg.getFrom().getUserName();
+				Game game = games.get(msg.getFrom().getUserName());
+				List<Pair<SendMessage, SendPhoto>> output = ConverterToTelegramApi.convert(game.step(new InputData(chatId, fromUser, msg.getText())));
 				
 				sendMsg(output);
 			}
 			if (e.hasCallbackQuery())
 			{
 				Long chatId = e.getCallbackQuery().getMessage().getChatId();
-				Game game = games.get(e.getCallbackQuery().getFrom().getFirstName());
-				Pair<SendMessage, SendPhoto> output = ConverterToTelegramApi.convert(game.step(e.getCallbackQuery().getData()), chatId);
+				String fromUser = e.getCallbackQuery().getFrom().getUserName();
+				Game game = games.get(e.getCallbackQuery().getFrom().getUserName());
+				List<Pair<SendMessage, SendPhoto>> output = ConverterToTelegramApi.convert(game.step(new InputData(chatId, fromUser, e.getCallbackQuery().getData())));
 				sendMsg(output);
 			}
 		}
@@ -47,21 +52,24 @@ public class PokeBot extends TelegramLongPollingBot {
 		return Reader.ReadToken("Token.txt");
 	}
 	
-	private void sendMsg( Pair<SendMessage, SendPhoto> msg) {
-		if (msg.hasItem1())
+	private void sendMsg( List<Pair<SendMessage, SendPhoto>> msg) {
+		for (Pair<SendMessage, SendPhoto> out : msg)
 		{
-			try { 
-				execute(msg.getItem1());
-			} catch (TelegramApiException e1) {
-				e1.printStackTrace();
+			if (out.hasItem1())
+			{
+				try { 
+					execute(out.getItem1());
+				} catch (TelegramApiException e1) {
+					e1.printStackTrace();
+				}
 			}
-		}
-		if (msg.hasItem2())
-		{
-			try { 
-				execute(msg.getItem2());
-			} catch (Exception e1) {
-				e1.printStackTrace();
+			if (out.hasItem2())
+			{
+				try { 
+					execute(out.getItem2());
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
 			}
 		}
 	}

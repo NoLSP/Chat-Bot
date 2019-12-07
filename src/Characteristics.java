@@ -35,7 +35,7 @@ public class Characteristics {
 	
 	public void reduceHealth(int damage)
 	{
-		this.health = (health - damage) % health;
+		this.health = this.health - damage;
 	}
 	
 	public int getSpeed()
