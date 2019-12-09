@@ -24,4 +24,8 @@ public class Player {
 	{
 		return chatId;
 	}
+
+	public void refresh() {
+		pokemon.refresh();
+	}
 }

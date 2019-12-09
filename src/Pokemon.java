@@ -79,7 +79,7 @@ public class Pokemon {
 	{
 		ArrayList<String> list = new ArrayList<String>();
 		for(Skill skill : skills)
-			list.add(skill.getName());
+			list.add(skill.getName() + (skill.getMovesBeforeRecovery() > 1 ? "(" + (skill.getMovesBeforeRecovery() - 1) + ")" : ""));
 		return list;
 	}
 
@@ -88,6 +88,7 @@ public class Pokemon {
 	}
 
 	public int useSkill(int skillIndex, Characteristics enemyChrs) {
+		refreshSkills();
 		Skill skill = skills.get(skillIndex);
 			if(skill.isReady())
 				return skill.use(characteristics, enemyChrs);
@@ -113,5 +114,9 @@ public class Pokemon {
 
 	public Characteristics getCharacteristics() {
 		return characteristics;
+	}
+
+	public void refresh() {
+		characteristics.reset();
 	}
 }

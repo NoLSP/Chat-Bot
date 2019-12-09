@@ -11,7 +11,8 @@ public class Game
 	private Phase phase;
 	private Task currentTask;
 	
-	private static final int FIGHT_PHASE_CODE = 400;
+	private static final int FIGHT_PHASE_INVITATION = 400;
+	private static final String CREATE_FIGHT = "/new";
 	
 	public Game()
 	{
@@ -53,10 +54,10 @@ public class Game
 				{
 					fight = new Fighter(data.getCurrentPokemon(), data);
 					phase = Phase.Fight;
-					return fight.next(input);
+					return fight.next(new InputData(input.getChatId(), input.getUserName(), CREATE_FIGHT));
 				}			
 		}
-		if ( (FIGHT_PHASE_CODE + "").equalsIgnoreCase(input.getData().substring(0, 3)))
+		if ( (FIGHT_PHASE_INVITATION + "").equalsIgnoreCase(input.getData().substring(0, 3)))
 		{	
 			fight = new Fighter(data.getCurrentPokemon(), data);
 			phase = Phase.Fight;

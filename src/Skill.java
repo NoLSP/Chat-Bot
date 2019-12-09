@@ -21,6 +21,11 @@ public class Skill {
 		return movesBeforeRecovery == 0;
 	}
 	
+	public int getMovesBeforeRecovery()
+	{
+		return movesBeforeRecovery;
+	}
+	
 	//возвращает количество урона
 	public int use(Characteristics myChrs, Characteristics enemyChrs)
 	{
@@ -32,7 +37,7 @@ public class Skill {
 
 		double damage = healthComponent + speedComponent + intellectComponent + strengthComponent + defenceComponent;
 		double defenceEffect = 1 - enemyChrs.getDefence()/100;
-		boolean bSpeedEffect = ((Math.random()* myChrs.getSpeed())>=(Math.random() * enemyChrs.getSpeed())); 
+		boolean bSpeedEffect = ((Math.random()* myChrs.getSpeed()*1.3)>=(Math.random() * enemyChrs.getSpeed())); 
 		int speedEffect = 0; 
 		if (bSpeedEffect) 
 		speedEffect = 1;

@@ -8,7 +8,6 @@ public class MultiFight implements Fight{
 	private static final int FIGHT = 401;
 	
 	private static final int INVITATION_YES = 0;
-	private static final int INVITATION_NO = 1;
 	
 	public MultiFight(Pokemon pokemon)
 	{

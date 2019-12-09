@@ -1,6 +1,7 @@
 
 public class Characteristics {
 	private int health;
+	private final int healthValue;
 	private int speed;
 	private int intellect;
 	private int strength;
@@ -8,6 +9,7 @@ public class Characteristics {
 	
 	public Characteristics(int[] input)
 	{
+		healthValue = input[0];
 		health = input[0];
 		speed = input[1];
 		intellect = input[2];
@@ -16,6 +18,7 @@ public class Characteristics {
 	}
 	public Characteristics(int health, int speed, int intellect, int strength, int defence)
 	{
+		healthValue = health;
 		this.health = health;
 		this.speed = speed;
 		this.intellect = intellect;
@@ -56,5 +59,8 @@ public class Characteristics {
 	public int getDefence()
 	{
 		return defence;
+	}
+	public void reset() {
+		health = healthValue;
 	}
 }

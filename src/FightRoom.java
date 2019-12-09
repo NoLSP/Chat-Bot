@@ -11,9 +11,6 @@ public class FightRoom {
 	private static final int INVITATION = 400;
 	private static final int FIGHT = 401;
 	
-	private static final int INVITATION_YES = 0;
-	private static final int INVITATION_NO = 1;
-	
 	public FightRoom(Player player1, Player player2)
 	{
 		this.player1 = player1;
@@ -61,52 +58,60 @@ public class FightRoom {
 	{
 		OutputData player1Turn = null;
 		OutputData player2Turn = null;
-		if (isPlayer1Turn)
-		{
-			player1Turn = new OutputData(player1.getChatId(), FIGHT, "Твой ход!", player1.getPokemon().getSkillsList());
-			player2Turn = new OutputData(player2.getChatId(), "Ожидание хода противника...");
-		}
-		else
-		{
-			player2Turn = new OutputData(player2.getChatId(), FIGHT, "Твой ход!", player2.getPokemon().getSkillsList());
-			player1Turn = new OutputData(player1.getChatId(), "Ожидание хода противника...");
-		}
+		Player firstPlayer = isPlayer1Turn ? player1 : player2;
+		Player secondPlayer = isPlayer1Turn ? player2 : player1;
+		player1Turn = new OutputData(firstPlayer.getChatId(), FIGHT, "Твой ход!", firstPlayer.getPokemon().getSkillsList());
+		player2Turn = new OutputData(secondPlayer.getChatId(), "Ожидание хода противника...");
 		return Arrays.asList(player1Turn, player2Turn);
 	}
 	
 	public List<OutputData> turn(InputData input)
 	{
-		if (player1.getChatId().equals(input.getChatId()) && !isPlayer1Turn ||
-				player2.getChatId().equals(input.getChatId()) && isPlayer1Turn)
-		{
+		if (!isCorrectPlayerTurn(input.getChatId()))
 				return Arrays.asList(new OutputData(input.getChatId(), "Ожидание хода противника..."));
-		}
 		int skillNumber = Integer.parseInt(input.getData().substring(input.getData().indexOf('.') + 1));
 		Player turningPlayer = player1.getChatId().equals(input.getChatId()) ? player1 : player2;
 		Player another = player1.getChatId().equals(input.getChatId()) ? player2 : player1;
 		int damage = turningPlayer.getPokemon().useSkill(skillNumber, another.getPokemon().getCharacteristics());
+		if (damage == -1)
+		{
+			return Arrays.asList(new OutputData(turningPlayer.getChatId(), "Эта способность еще не восстановилась, используй другую:", 
+														turningPlayer.getPokemon().getSkillsList()));
+		}
 		another.getPokemon().hurt(damage);
-		
 		if (another.getPokemon().isDead())
 		{
 			fightIsComplete = true;
 			OutputData msgTurningPlayer = new OutputData(turningPlayer.getChatId(), Arrays.asList("Твой покемон нанес урон (" + damage + ")", 
 					"Поздравляем, твой покемон победил!"));
 			OutputData msgAnother = new OutputData(another.getChatId(), Arrays.asList("Противник нанес тебе урон: (" + damage + ")", 
-					"К сожалению, ты проиграл"));
-			return Arrays.asList(msgTurningPlayer, msgAnother);
-			
+					"К сожалению, ты проиграл."));
+			return Arrays.asList(msgTurningPlayer, msgAnother);	
 		}
-		
-		OutputData msgTurningPlayer = new OutputData(turningPlayer.getChatId(), Arrays.asList("Твой покемон нанес урон (" + damage + ")", 
+		OutputData msgTurningPlayer = new OutputData(turningPlayer.getChatId(), Arrays.asList("Твой покемон нанес урон (" + damage + ")" + (damage == 0 ? " - Промах!" : ""),
 										"Здоровье противника: (" + another.getPokemon().getHealth() +")"));
 		OutputData msgAnother = new OutputData(another.getChatId(), Arrays.asList("Противник нанес тебе урон: (" + damage + ")", 
 				"Текущее здоровье: (" + another.getPokemon().getHealth() +")"));
 		List<OutputData> out = new ArrayList<OutputData>();
-		out.addAll(Arrays.asList(msgTurningPlayer, msgAnother));
+		out.add(msgTurningPlayer);
+		out.add(msgAnother);
 		isPlayer1Turn = !isPlayer1Turn;
 		out.addAll(turn());
 		return out;
+	}
+	
+	private boolean isCorrectPlayerTurn(Long chatId)
+	{
+		return (player1.getChatId().equals(chatId) && isPlayer1Turn) || (player2.getChatId().equals(chatId) && !isPlayer1Turn);
+	}
+
+	public Player getAnotherPayer(Player player) {
+		return player1.getUserName().equals(player.getUserName()) ? player2 : player1;
+	}
+
+	public void refreshPlayers() {
+		player1.refresh();
+		player2.refresh();
 	}
 	
 	
