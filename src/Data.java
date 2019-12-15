@@ -104,7 +104,7 @@ public class Data
 		return answers[result];
 	}
 
-	public Pokemon getRandomPokemon()
+	public static Pokemon getRandomPokemon()
 	{
 		String rndPokeName = getRandomFileName(new File("").getAbsolutePath()+ "/PokeInfo/");
 		try {
@@ -115,7 +115,7 @@ public class Data
 		return null;
 	}
 
-	private String getRandomFileName(String path)
+	private static String getRandomFileName(String path)
 	{
 		String[] filesNames = getFileList(path);
 		MyRandom rnd = new MyRandom(filesNames.length-1);
@@ -123,7 +123,7 @@ public class Data
 		return filesNames[index];
 	}	
 	
-	private String[] getFileList(String path)
+	private static String[] getFileList(String path)
 	{
 		File folder = new File(path);
 		String[] files = folder.list(new FilenameFilter() {

@@ -117,33 +117,34 @@ class Tests {
 	Assert.assertEquals("Пикачу.jpg", out.getImage().getName());}
 
 
-	@Test
-	void testStartFightPhase() throws Exception {
-	Fighter fight = new Fighter(new Pokemon("Пикачу", "info"), new Data());
-	OutputData out = fight.next(new InputData((long) 12345, "name", "/fight")).get(0);
-	Assert.assertEquals(Arrays.asList("С кем желаешь сразиться?"), out.getMessage());
-	Assert.assertEquals(Arrays.asList("Случайный противник", "Пользователь"), out.getKeyboard());}
-
-	@Test
-	void testSingleFightPhase() throws Exception {
-	Fighter fight = new Fighter(new Pokemon("Пикачу", "info"), new Data());
-	OutputData out = fight.next(new InputData((long) 12345, "name", "/fight")).get(0);
-	out = fight.next(new InputData((long) 12345, "name", "200.0")).get(0);
-	Assert.assertEquals(fight.getStatus(), Status.Single);}
-	
-	@Test
-	void testStartMultiFightPhase() throws Exception {
-	Fighter fight = new Fighter(new Pokemon("Пикачу", "info"), new Data());
-	OutputData out = fight.next(new InputData((long) 12345, "name", "/fight")).get(0);
-	out = fight.next(new InputData((long) 12345, "name", "200.1")).get(0);
-	Assert.assertEquals(fight.getStatus(), Status.Multi);}
-	
-	@Test
-	void testChoseEnemyMultiFightPhase() throws Exception {
-	Fighter fight = new Fighter(new Pokemon("Пикачу", "info"), new Data());
-	OutputData out = fight.next(new InputData((long) 12345, "name", "/fight")).get(0);
-	out = fight.next(new InputData((long) 12345, "name", "200.1")).get(0);
-	Assert.assertEquals(out.getMessage().get(0), "С кем конкретно? (Введи user name)");
-	out = fight.next(new InputData((long) 12345, "name", "blablabla")).get(0);
-	Assert.assertEquals(out.getMessage().get(0), "Этого противника еще нет в игре)");}
+	/*
+	 * @Test void testStartFightPhase() throws Exception { Fighter fight = new
+	 * Fighter(new Pokemon("Пикачу", "info"), new Data()); OutputData out =
+	 * fight.next(new InputData((long) 12345, "name", "/fight")).get(0);
+	 * Assert.assertEquals(Arrays.asList("С кем желаешь сразиться?"),
+	 * out.getMessage()); Assert.assertEquals(Arrays.asList("Случайный противник",
+	 * "Пользователь"), out.getKeyboard());}
+	 * 
+	 * @Test void testSingleFightPhase() throws Exception { Fighter fight = new
+	 * Fighter(new Pokemon("Пикачу", "info"), new Data()); OutputData out =
+	 * fight.next(new InputData((long) 12345, "name", "/fight")).get(0); out =
+	 * fight.next(new InputData((long) 12345, "name", "200.0")).get(0);
+	 * Assert.assertEquals(fight.getStatus(), Status.Single);}
+	 * 
+	 * @Test void testStartMultiFightPhase() throws Exception { Fighter fight = new
+	 * Fighter(new Pokemon("Пикачу", "info"), new Data()); OutputData out =
+	 * fight.next(new InputData((long) 12345, "name", "/fight")).get(0); out =
+	 * fight.next(new InputData((long) 12345, "name", "200.1")).get(0);
+	 * Assert.assertEquals(fight.getStatus(), Status.Multi);}
+	 * 
+	 * @Test void testChoseEnemyMultiFightPhase() throws Exception { Fighter fight =
+	 * new Fighter(new Pokemon("Пикачу", "info"), new Data()); OutputData out =
+	 * fight.next(new InputData((long) 12345, "name", "/fight")).get(0); out =
+	 * fight.next(new InputData((long) 12345, "name", "200.1")).get(0);
+	 * Assert.assertEquals(out.getMessage().get(0),
+	 * "С кем конкретно? (Введи user name)"); out = fight.next(new InputData((long)
+	 * 12345, "name", "blablabla")).get(0);
+	 * Assert.assertEquals(out.getMessage().get(0),
+	 * "Этого противника еще нет в игре)");}
+	 */
 }

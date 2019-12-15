@@ -59,4 +59,8 @@ public class Skill {
 		if (movesBeforeRecovery > 0) movesBeforeRecovery--;
 		
 	}
+
+	public void reset() {
+		movesBeforeRecovery = 0;		
+	}
 }

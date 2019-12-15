@@ -62,6 +62,19 @@ public class OutputData {
     	this.chatId = chatId;
 	}
 
+	public OutputData(Long chatId, int questionId, List<String> messageList) {
+		this.message = messageList;
+    	this.id = questionId;
+    	this.chatId = chatId;
+	}
+
+	public OutputData(Long chatId, String message, File photo) {
+		this.message = Arrays.asList(message);
+    	this.id = -1;
+    	this.chatId = chatId;
+    	this.image = photo;
+	}
+
 	public Long getChatId()
     {
     	return chatId;
